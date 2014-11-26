@@ -14,7 +14,7 @@ namespace Calendar
         [STAThread]
         static void Main()
         {
-            Application.Run(new PaintCalendar(new CalendarPage(2014, 11)));
+            DrawCalendar.Draw(new CalendarPage(2014, 11));
         }
     }
 }
