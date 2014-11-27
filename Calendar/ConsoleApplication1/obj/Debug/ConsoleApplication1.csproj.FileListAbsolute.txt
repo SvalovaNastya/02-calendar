@@ -1,6 +1,0 @@
-C:\Users\Lenovo\Desktop\kontur\02-calendar\Calendar\ConsoleApplication1\bin\Debug\ConsoleApplication1.exe.config
-C:\Users\Lenovo\Desktop\kontur\02-calendar\Calendar\ConsoleApplication1\bin\Debug\ConsoleApplication1.exe
-C:\Users\Lenovo\Desktop\kontur\02-calendar\Calendar\ConsoleApplication1\bin\Debug\ConsoleApplication1.pdb
-C:\Users\Lenovo\Desktop\kontur\02-calendar\Calendar\ConsoleApplication1\obj\Debug\ConsoleApplication1.exe
-C:\Users\Lenovo\Desktop\kontur\02-calendar\Calendar\ConsoleApplication1\obj\Debug\ConsoleApplication1.pdb
-C:\Users\Lenovo\Desktop\kontur\02-calendar\Calendar\ConsoleApplication1\obj\Debug\ConsoleApplication1.csprojResolveAssemblyReference.cache

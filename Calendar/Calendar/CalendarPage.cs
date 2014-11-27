@@ -22,15 +22,19 @@ namespace Calendar
             DayOfWeekFirstDay = ((int)firstDay.DayOfWeek - 1 + DaysOfWeekCount) % DaysOfWeekCount;
             DaysInMonth = DateTime.DaysInMonth(firstDay.Year, firstDay.Month);
             CalendarPageAsArray = SetCalendarPage();
+            this.SetToday(27);
         }
 
-        public Tuple<int, int> SetToday(int day)
+        public void SetToday(int day)
         {
             if (day <= DaysInMonth && day > 0)
                 for (int i = 0; i < CalendarPageAsArray.GetLength(0); i++)
                     for (int j = 0; j < CalendarPageAsArray[i].Length; j++)
                         if (CalendarPageAsArray[i][j] == day)
-                            return Tuple.Create(i, j);
+                        {
+                            Today = Tuple.Create(i, j);
+                            return;
+                        }
             throw new Exception("День из неправильного диапозона");
         }
 
