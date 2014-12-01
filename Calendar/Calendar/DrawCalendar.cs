@@ -20,15 +20,31 @@ namespace Calendar
                 Font drawFont = new Font("Arial", 16);
                 var weigthInterval = sizeScreen.Height/(calendar.CalendarPageAsArray.GetLength(0) + 1);
                 var heightInterval = sizeScreen.Width/(calendar.CalendarPageAsArray[0].Length);
-                for (int i = 0; i < calendar.DaysOfWeekCount; i++)
-                    g.DrawString(((DayOfWeek)((i + 1 + calendar.DaysOfWeekCount) % calendar.DaysOfWeekCount)).ToString(), drawFont, new SolidBrush(Color.Black),
+                var minInterval = Math.Min(weigthInterval, heightInterval);
+                for (int i = 0; i < calendar.DaysOfWeek.Length; i++)
+                    g.DrawString(calendar.DaysOfWeek[i], drawFont, new SolidBrush(Color.Black),
                              i * heightInterval + heightInterval / 2, 0 + weigthInterval / 2, new StringFormat() { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center });
-                g.FillEllipse(new SolidBrush(Color.BlueViolet), new RectangleF(new PointF(calendar.Today.Item2 * heightInterval, calendar.Today.Item1 * weigthInterval), new SizeF(heightInterval, weigthInterval)));
                 for (int i = 0; i < calendar.CalendarPageAsArray.GetLength(0); i++)
                     for (int j = 0; j < calendar.CalendarPageAsArray[i].Length; j++)
-                        if (calendar.CalendarPageAsArray[i][j] != 0)
-                            g.DrawString(calendar.CalendarPageAsArray[i][j].ToString(), drawFont, new SolidBrush(Color.Black), 
-                                new PointF(j * heightInterval + heightInterval / 2, (i + 1) * weigthInterval + weigthInterval / 2), new StringFormat() { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center});
+                        if (calendar.CalendarPageAsArray[i][j] != null)
+                        {
+                            if (calendar.CalendarPageAsArray[i][j].Status == Status.CurrentDay)
+                                g.FillEllipse(new SolidBrush(Color.BlueViolet),
+                                    new RectangleF(
+                                        new PointF(
+                                            j*heightInterval + (heightInterval - minInterval)/2,
+                                            (i + 1)*weigthInterval + (weigthInterval - minInterval)/2),
+                                        new SizeF(minInterval, minInterval)));
+                            g.DrawString(calendar.CalendarPageAsArray[i][j].Number.ToString(), drawFont,
+                                new SolidBrush(Color.Black),
+                                new PointF(j*heightInterval + heightInterval/2,
+                                    (i + 1)*weigthInterval + weigthInterval/2),
+                                new StringFormat()
+                                {
+                                    Alignment = StringAlignment.Center,
+                                    LineAlignment = StringAlignment.Center
+                                });
+                        }
             }
             b.Save("1.bmp", System.Drawing.Imaging.ImageFormat.Bmp);
         }

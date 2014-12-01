@@ -14,7 +14,9 @@ namespace Calendar
         [STAThread]
         static void Main()
         {
-            DrawCalendar.Draw(new CalendarPage(2014, 11));
+            var dataString = Console.ReadLine().Split('.').Select(x => int.Parse(x)).ToArray();
+            var calendar = new CalendarPage(dataString[2], dataString[1]);
+            DrawCalendar.Draw(calendar);
         }
     }
 }

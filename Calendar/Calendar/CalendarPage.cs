@@ -1,75 +1,101 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Calendar
 {
+    public enum Status
+    {
+        UsualDay,
+        Weekend,
+        CurrentDay,
+        SpecialDay
+    }
+
+    public class Day
+    {
+        public readonly int Number;
+        public Status Status;
+
+        public Day(int number, Status status = Status.UsualDay)
+        {
+            Number = number;
+            Status = status;
+        }
+    }
+
     public class CalendarPage
     {
+        public Day[][] CalendarPageAsArray { get; private set; }
+        public string[] DaysOfWeek;
         private DateTime firstDay;
-        public int[][] CalendarPageAsArray { get; private set; }
-        public readonly int DaysOfWeekCount;
-        public readonly int DayOfWeekFirstDay;
         public readonly int DaysInMonth;
-        public Tuple<int, int> Today { get; private set; }
+//        public Tuple<int, int> Today { get; private set; }
 
-        public CalendarPage(int year, int month)
+        public CalendarPage(int year, int month, DayOfWeek firstDayInWeek = DayOfWeek.Monday)
         {
+            DaysOfWeek = MoveArray(Enum.GetValues(typeof (DayOfWeek)), (int) firstDayInWeek)
+                .Select(x => x.ToString()).ToArray();
+            DaysInMonth = DateTime.DaysInMonth(year, month);
             firstDay = new DateTime(year, month, 1);
-            DaysOfWeekCount = Enum.GetValues(typeof (DayOfWeek)).Length;
-            DayOfWeekFirstDay = ((int)firstDay.DayOfWeek - 1 + DaysOfWeekCount) % DaysOfWeekCount;
-            DaysInMonth = DateTime.DaysInMonth(firstDay.Year, firstDay.Month);
-            CalendarPageAsArray = SetCalendarPage();
-            this.SetToday(27);
+            CalendarPageAsArray = GetCalendarPage();
+            SetSpecialDay(27, Status.CurrentDay);
         }
 
-        public void SetToday(int day)
+        private object[] MoveArray(Array array, int offer)
         {
-            if (day <= DaysInMonth && day > 0)
-                for (int i = 0; i < CalendarPageAsArray.GetLength(0); i++)
-                    for (int j = 0; j < CalendarPageAsArray[i].Length; j++)
-                        if (CalendarPageAsArray[i][j] == day)
-                        {
-                            Today = Tuple.Create(i, j);
-                            return;
-                        }
-            throw new Exception("День из неправильного диапозона");
-        }
-
-        private int[][] SetCalendarPage()
-        {
-            var month = new List<List<int>>();
+            var tempArray = new object[array.Length];
+            offer = array.Length - offer;
             int count = 0;
-            while (count < DaysInMonth)
-                count = FillingMonthArray(month, count);
+            foreach (var element in array)
+            {
+                tempArray[(count + offer) % array.Length] = element;
+                count++;
+            }
+            return tempArray;
+        }
+
+        private Day[][] GetCalendarPage()
+        {
+            var month = new List<List<Day>>();
+            int countOfDaysInMonth = 0;
+            while (countOfDaysInMonth < DaysInMonth)
+                countOfDaysInMonth = FillingMonthArray(month, countOfDaysInMonth);
             return month.Select(x => x.ToArray()).ToArray();
         }
 
-        private int FillingMonthArray(List<List<int>> month, int count)
+        private int FillingMonthArray(List<List<Day>> month, int countOfDaysInMonth)
         {
-            month.Add(new List<int>());
-            for (int i = 0; i < DaysOfWeekCount; i++)
-                count = AddOnlyCorrectDays(month, count, i);
-            return count;
+            month.Add(new List<Day>());
+            for (int i = 0; i < DaysOfWeek.Length; i++)
+                countOfDaysInMonth = AddOnlyDaysInThisMonth(month, countOfDaysInMonth, i);
+            return countOfDaysInMonth;
         }
 
-        private int AddOnlyCorrectDays(List<List<int>> month, int count, int i)
+        private int AddOnlyDaysInThisMonth(List<List<Day>> month, int countOfDaysInMonth, int i)
         {
-            if (IsDayInThisMonth(count, i))
-                month[month.Count - 1].Add(0);
+            if (IsDayInThisMonth(countOfDaysInMonth, i))
+                month[month.Count - 1].Add(null);
             else
             {
-                count++;
-                month[month.Count - 1].Add(count);
+                countOfDaysInMonth++;
+                month[month.Count - 1].Add(new Day(countOfDaysInMonth));
             }
-            return count;
+            return countOfDaysInMonth;
+        }
+
+        public void SetSpecialDay(int day, Status status)
+        {
+            for (int i = 0; i < CalendarPageAsArray.GetLength(0); i++)
+                for (int j = 0; j < CalendarPageAsArray[i].Length; j++)
+                    if (CalendarPageAsArray[i][j] != null && CalendarPageAsArray[i][j].Number == day)
+                        CalendarPageAsArray[i][j].Status = status;
+//            throw new IndexOutOfRangeException("День из неправильного диапозона");
         }
 
         private bool IsDayInThisMonth(int count, int i)
         {
-            return (count == 0 && i < DayOfWeekFirstDay) || count >= DaysInMonth;
+            return (count == 0 && i < Array.IndexOf(DaysOfWeek, firstDay.DayOfWeek.ToString())) || count >= DaysInMonth;
         }
     }
 }
