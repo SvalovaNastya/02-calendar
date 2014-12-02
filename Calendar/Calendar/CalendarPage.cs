@@ -7,7 +7,6 @@ namespace Calendar
     public enum Status
     {
         UsualDay,
-        Weekend,
         CurrentDay,
         SpecialDay
     }
@@ -16,30 +15,42 @@ namespace Calendar
     {
         public readonly int Number;
         public Status Status;
+        public bool IsWeekend;
 
-        public Day(int number, Status status = Status.UsualDay)
+        public Day(int number, Status status = Status.UsualDay, bool isWeekend = false)
         {
             Number = number;
             Status = status;
+            IsWeekend = isWeekend;
         }
     }
+
+//    public class KVP : Tuple<string, string>
+//    {
+//        public KVP(string key, string value) : base(key, value)
+//        {
+//        }
+//        
+//        string Key {get { return Item1; }}
+//    }
 
     public class CalendarPage
     {
         public Day[][] CalendarPageAsArray { get; private set; }
-        public string[] DaysOfWeek;
+        public DayOfWeek[] DaysOfWeek = {DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday, DayOfWeek.Friday, DayOfWeek.Saturday, DayOfWeek.Sunday, };
         private DateTime firstDay;
         public readonly int DaysInMonth;
-//        public Tuple<int, int> Today { get; private set; }
+        public DayOfWeek[] Weekends = new DayOfWeek[] {DayOfWeek.Saturday, DayOfWeek.Sunday};
 
-        public CalendarPage(int year, int month, DayOfWeek firstDayInWeek = DayOfWeek.Monday)
+        public CalendarPage(int year, int month, DayOfWeek firstDayInWeek = DayOfWeek.Monday, DayOfWeek[] weekends = null)
         {
+            if (weekends != null)
+                Weekends = weekends;
             DaysOfWeek = MoveArray(Enum.GetValues(typeof (DayOfWeek)), (int) firstDayInWeek)
-                .Select(x => x.ToString()).ToArray();
+                .Select(x => (DayOfWeek)x).ToArray();
             DaysInMonth = DateTime.DaysInMonth(year, month);
             firstDay = new DateTime(year, month, 1);
             CalendarPageAsArray = GetCalendarPage();
-            SetSpecialDay(27, Status.CurrentDay);
         }
 
         private object[] MoveArray(Array array, int offer)
@@ -79,18 +90,27 @@ namespace Calendar
             else
             {
                 countOfDaysInMonth++;
-                month[month.Count - 1].Add(new Day(countOfDaysInMonth));
+                var newDay = new Day(countOfDaysInMonth);
+                if (Weekends.Contains(DaysOfWeek[i]))
+                    newDay.IsWeekend = true;
+                month[month.Count - 1].Add(newDay);
             }
             return countOfDaysInMonth;
         }
 
         public void SetSpecialDay(int day, Status status)
         {
+            bool isTrueDay = false;
             for (int i = 0; i < CalendarPageAsArray.GetLength(0); i++)
                 for (int j = 0; j < CalendarPageAsArray[i].Length; j++)
                     if (CalendarPageAsArray[i][j] != null && CalendarPageAsArray[i][j].Number == day)
+                    {
                         CalendarPageAsArray[i][j].Status = status;
-//            throw new IndexOutOfRangeException("День из неправильного диапозона");
+                        isTrueDay = true;
+                    }
+            if (!isTrueDay)
+                throw new IndexOutOfRangeException("День из неправильного диапозона");
+
         }
 
         private bool IsDayInThisMonth(int count, int i)
